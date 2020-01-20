@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/layout_video"
@@ -15,11 +13,12 @@
         android:layout_height="match_parent"
         android:background="@color/gray_DBE2E5">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="@dimen/dp_45"
             android:layout_height="@dimen/dp_45"
             android:layout_gravity="center"
             android:src="@drawable/pic_video" />
+
     </FrameLayout>
 
     <View
@@ -41,7 +40,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/view_bg_info" />
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/ic_video"
         android:layout_width="@dimen/dp_19"
         android:layout_height="@dimen/dp_19"
@@ -53,7 +52,7 @@
         app:layout_constraintTop_toTopOf="@id/view_bg_info"
         app:layout_goneMarginEnd="@dimen/dp_7" />
 
-    <io.agora.rtc.education.room.view.SpeakerView
+    <io.agora.education.classroom.widget.RtcAudioView
         android:id="@+id/ic_audio"
         android:layout_width="@dimen/dp_19"
         android:layout_height="@dimen/dp_19"

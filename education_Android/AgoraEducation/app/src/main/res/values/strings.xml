@@ -4,8 +4,8 @@
     <string name="hint_room_name">Room Name</string>
     <string name="hint_your_name">Your Name</string>
     <string name="hint_room_type">Room Type</string>
-    <string name="one_to_one">One-to-One</string>
-    <string name="mini_class">Small Class</string>
+    <string name="one2one_class">One-to-One</string>
+    <string name="small_class">Small Class</string>
     <string name="large_class">Large Class</string>
     <string name="eye_care_mode">Eye protection</string>
     <string name="Join">Join</string>
@@ -16,7 +16,7 @@
     <string name="cancel">Cancel</string>
     <string name="hint_im_message">Input message</string>
     <string name="confirm">Confirm</string>
-    <string name="Student">Student</string>
+    <string name="title_student_list">Student</string>
     <string name="Room_name_should_not_be_empty">Room name should not be empty.</string>
     <string name="Your_name_should_not_be_empty">Your name should not be empty.</string>
     <string name="Room_type_should_not_be_empty">Room type should not be empty.</string>

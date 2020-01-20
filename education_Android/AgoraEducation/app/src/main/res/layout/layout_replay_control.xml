@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/black_66">
 
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/btn_play"
         android:layout_width="@dimen/dp_40"
         android:layout_height="@dimen/dp_40"
@@ -22,7 +22,7 @@
         android:paddingStart="@dimen/dp_10"
         android:paddingEnd="@dimen/dp_10">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_play_pause"
             android:layout_width="@dimen/dp_24"
             android:layout_height="@dimen/dp_24"

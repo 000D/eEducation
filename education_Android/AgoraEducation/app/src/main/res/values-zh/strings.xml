@@ -3,8 +3,8 @@
     <string name="hint_room_name">房间名</string>
     <string name="hint_your_name">用户名</string>
     <string name="hint_room_type">房间类型</string>
-    <string name="one_to_one">一对一</string>
-    <string name="mini_class">小班课</string>
+    <string name="one2one_class">一对一</string>
+    <string name="small_class">小班课</string>
     <string name="large_class">大班课</string>
     <string name="eye_care_mode">护眼模式</string>
     <string name="Join">加入</string>
@@ -15,7 +15,7 @@
     <string name="cancel">取消</string>
     <string name="hint_im_message">说点什么</string>
     <string name="confirm">确定</string>
-    <string name="Student">学生</string>
+    <string name="title_student_list">学生</string>
     <string name="Room_name_should_not_be_empty">房间名不能为空</string>
     <string name="Your_name_should_not_be_empty">用户名不能为空</string>
     <string name="Room_type_should_not_be_empty">房间类型不能为空</string>

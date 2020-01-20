@@ -24,4 +24,5 @@
         android:paddingTop="@dimen/dp_5"
         android:paddingEnd="@dimen/dp_9"
         android:paddingBottom="@dimen/dp_5" />
+
 </LinearLayout>
