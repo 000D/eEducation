@@ -201,14 +201,14 @@ public class ReplayControlView extends RelativeLayout implements View.OnClickLis
             switch (playerPhase) {
                 case playing:
                     btn_play.setVisibility(GONE);
-                    btn_play_pause.setImageResource(R.drawable.icon_pause);
+                    btn_play_pause.setImageResource(R.drawable.ic_pause);
                     setVisibility(VISIBLE);
                     break;
                 case pause:
                 case ended:
                 case stopped:
                     btn_play.setVisibility(VISIBLE);
-                    btn_play_pause.setImageResource(R.drawable.icon_play);
+                    btn_play_pause.setImageResource(R.drawable.ic_play);
                     setVisibility(VISIBLE);
                     break;
             }

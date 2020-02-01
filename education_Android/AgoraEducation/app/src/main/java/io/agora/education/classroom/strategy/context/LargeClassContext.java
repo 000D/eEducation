@@ -4,16 +4,23 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.agora.education.classroom.bean.msg.Cmd;
 import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.strategy.channel.ChannelStrategy;
+import io.agora.education.classroom.bean.user.Teacher;
+import io.agora.education.classroom.bean.user.User;
+import io.agora.education.classroom.strategy.ChannelStrategy;
 import io.agora.rtc.Constants;
 import io.agora.rtm.ErrorInfo;
 import io.agora.rtm.ResultCallback;
 import io.agora.sdk.manager.RtcManager;
 
 public class LargeClassContext extends ClassContext {
+
+    private boolean applying;
 
     LargeClassContext(Context context, ChannelStrategy strategy) {
         super(context, strategy);
@@ -32,6 +39,57 @@ public class LargeClassContext extends ClassContext {
     }
 
     @Override
+    public void onTeacherChanged(Teacher teacher) {
+        super.onTeacherChanged(teacher);
+        if (classEventListener instanceof LargeClassEventListener) {
+            runListener(() -> {
+                LargeClassEventListener listener = (LargeClassEventListener) classEventListener;
+                listener.onLinkUidChanged(teacher.link_uid);
+                listener.onTeacherMediaChanged(teacher);
+            });
+            if (teacher.link_uid == 0) {
+                runListener(() -> ((LargeClassEventListener) classEventListener).onLinkMediaChanged(null));
+            } else {
+                onLinkMediaChanged(channelStrategy.getAllStudents());
+            }
+        }
+    }
+
+    @Override
+    public void onLocalChanged(Student local) {
+        super.onLocalChanged(local);
+        if (local.isGenerate) return;
+        if (applying) {
+            applying = false;
+            // send apply order to the teacher when local attributes updated
+            apply(false);
+        }
+        onLinkMediaChanged(Collections.singletonList(local));
+    }
+
+    @Override
+    public void onStudentsChanged(List<Student> students) {
+        super.onStudentsChanged(students);
+        onLinkMediaChanged(students);
+    }
+
+    private void onLinkMediaChanged(List users) {
+        Teacher teacher = channelStrategy.getTeacher();
+        if (teacher == null) return;
+        for (Object object : users) {
+            if (object instanceof User) {
+                User user = (User) object;
+                if (user.uid == teacher.link_uid) {
+                    if (classEventListener instanceof LargeClassEventListener) {
+                        runListener(() -> ((LargeClassEventListener) classEventListener).onLinkMediaChanged(user));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
     public void onPeerMsgReceived(PeerMsg msg) {
         super.onPeerMsgReceived(msg);
         Cmd cmd = msg.getCmd();
@@ -43,22 +101,58 @@ public class LargeClassContext extends ClassContext {
             case REJECT:
                 reject();
                 break;
+            case CANCEL:
+                cancel(true);
+                break;
         }
     }
 
     public void apply(boolean isPrepare) {
         if (isPrepare) {
-            channelStrategy.updateLocalAttribute(channelStrategy.getLocal(), null);
+            channelStrategy.clearLocalAttribute(new ResultCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    channelStrategy.updateLocalAttribute(channelStrategy.getLocal(), new ResultCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            applying = true;
+                        }
+
+                        @Override
+                        public void onFailure(ErrorInfo errorInfo) {
+                            applying = false;
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(ErrorInfo errorInfo) {
+
+                }
+            });
         } else {
-            channelStrategy.getTeacher().sendMessageTo(Cmd.APPLY);
+            Teacher teacher = channelStrategy.getTeacher();
+            if (teacher != null) {
+                teacher.sendMessageTo(Cmd.APPLY);
+            }
         }
     }
 
-    public void cancel() {
+    public void cancel(boolean isRemote) {
         channelStrategy.clearLocalAttribute(new ResultCallback<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                channelStrategy.getTeacher().sendMessageTo(Cmd.CANCEL);
+                RtcManager.instance().setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
+                if (isRemote) {
+                    if (classEventListener instanceof LargeClassEventListener) {
+                        runListener(() -> ((LargeClassEventListener) classEventListener).onHandUpCanceled());
+                    }
+                } else {
+                    Teacher teacher = channelStrategy.getTeacher();
+                    if (teacher != null) {
+                        teacher.sendMessageTo(Cmd.CANCEL);
+                    }
+                }
             }
 
             @Override
@@ -89,7 +183,7 @@ public class LargeClassContext extends ClassContext {
         channelStrategy.clearLocalAttribute(new ResultCallback<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                RtcManager.instance().setClientRole(Constants.CLIENT_ROLE_AUDIENCE);
+                applying = false;
             }
 
             @Override
@@ -97,6 +191,18 @@ public class LargeClassContext extends ClassContext {
 
             }
         });
+    }
+
+    public interface LargeClassEventListener extends ClassEventListener {
+        void onUserCountChanged(int count);
+
+        void onTeacherMediaChanged(User user);
+
+        void onLinkMediaChanged(User user);
+
+        void onLinkUidChanged(int uid);
+
+        void onHandUpCanceled();
     }
 
 }

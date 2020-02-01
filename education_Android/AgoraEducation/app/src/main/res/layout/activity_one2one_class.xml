@@ -95,7 +95,7 @@
         android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
         android:layout_marginTop="@dimen/dp_5"
-        android:src="@drawable/ic_slt_show_im"
+        android:src="@drawable/ic_float"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_view" />
 

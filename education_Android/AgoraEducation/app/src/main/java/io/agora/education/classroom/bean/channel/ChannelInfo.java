@@ -9,6 +9,8 @@ import io.agora.education.classroom.bean.user.Teacher;
 
 public class ChannelInfo extends JsonBean {
 
+    public static int SHARE_UID = 7;
+
     public volatile Student local;
     public volatile Teacher teacher;
     public volatile List<Student> students;

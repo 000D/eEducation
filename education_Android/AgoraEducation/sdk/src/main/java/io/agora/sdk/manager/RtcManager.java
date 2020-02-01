@@ -113,6 +113,10 @@ public final class RtcManager extends SdkManager<RtcEngine> {
         sdk.setRemoteVideoStreamType(uid, streamType);
     }
 
+    public void setRemoteDefaultVideoStreamType(@StreamType int streamType) {
+        sdk.setRemoteDefaultVideoStreamType(streamType);
+    }
+
     public SurfaceView createRendererView(Context context) {
         return RtcEngine.CreateRendererView(context);
     }

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import io.agora.education.classroom.annotation.ClassType;
 import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.strategy.channel.RtmChannelStrategy;
+import io.agora.education.classroom.strategy.RtmChannelStrategy;
 
 public class ClassContextFactory {
 

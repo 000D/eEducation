@@ -23,10 +23,10 @@ public class RtcAudioView extends AppCompatImageView {
     }
 
     private int[] imgResArray = {
-            R.drawable.icon_speaker_off_s,
-            R.drawable.icon_speaker1,
-            R.drawable.icon_speaker2,
-            R.drawable.icon_speaker3
+            R.drawable.ic_speaker_off,
+            R.drawable.ic_speaker1,
+            R.drawable.ic_speaker2,
+            R.drawable.ic_speaker3
     };
     private int showIndex = 0;
     private int state = State.CLOSED;

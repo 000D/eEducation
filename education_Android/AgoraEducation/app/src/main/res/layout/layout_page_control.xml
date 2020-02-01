@@ -13,14 +13,14 @@
             android:layout_width="@dimen/dp_36"
             android:layout_height="@dimen/dp_36"
             android:layout_marginStart="@dimen/dp_4"
-            android:src="@drawable/icon_first" />
+            android:src="@drawable/ic_first" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_previous"
             android:layout_width="@dimen/dp_36"
             android:layout_height="@dimen/dp_36"
             android:layout_marginStart="@dimen/dp_4"
-            android:src="@drawable/icon_prev" />
+            android:src="@drawable/ic_prev" />
 
         <TextView
             android:id="@+id/tv_page"
@@ -36,14 +36,14 @@
             android:layout_width="@dimen/dp_36"
             android:layout_height="@dimen/dp_36"
             android:layout_marginStart="@dimen/dp_4"
-            android:src="@drawable/icon_next" />
+            android:src="@drawable/ic_next" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_end"
             android:layout_width="@dimen/dp_36"
             android:layout_height="@dimen/dp_36"
             android:layout_marginStart="@dimen/dp_4"
-            android:src="@drawable/icon_end" />
+            android:src="@drawable/ic_end" />
 
     </LinearLayout>
 

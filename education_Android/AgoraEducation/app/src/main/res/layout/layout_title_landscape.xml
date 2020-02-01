@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/ic_wifi"
+        android:id="@+id/iv_quality"
         android:layout_width="@dimen/dp_20"
         android:layout_height="@dimen/dp_20"
-        android:src="@drawable/ic_wifi_black_24dp"
+        android:src="@drawable/ic_signal_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,9 +35,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_close"
-        android:layout_width="@dimen/dp_20"
+        android:layout_width="@dimen/dp_30"
         android:layout_height="@dimen/dp_30"
-        android:src="@drawable/icon_close"
+        android:src="@drawable/ic_close"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

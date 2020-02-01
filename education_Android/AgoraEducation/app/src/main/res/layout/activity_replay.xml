@@ -33,7 +33,7 @@
             android:layout_width="@dimen/dp_90"
             android:layout_height="@dimen/dp_90"
             android:layout_gravity="center"
-            android:src="@drawable/pic_teacher"
+            android:src="@drawable/ic_teacher"
             android:visibility="gone" />
 
     </FrameLayout>
@@ -50,7 +50,7 @@
             android:layout_width="@dimen/dp_130"
             android:layout_height="@dimen/dp_130"
             android:layout_gravity="center"
-            android:src="@drawable/pic_message" />
+            android:src="@drawable/img_message" />
 
     </FrameLayout>
 
@@ -61,7 +61,7 @@
         android:layout_marginStart="@dimen/dp_10"
         android:layout_marginTop="@dimen/dp_10"
         android:background="@drawable/bg_radius_5_black_7f"
-        android:src="@drawable/icon_back"
+        android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

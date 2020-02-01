@@ -13,11 +13,11 @@ import io.agora.education.R;
 public class ApplianceView extends RadioGroup {
 
     private final int[] appliances = new int[]{
-            R.drawable.tool_selector,
-            R.drawable.tool_pencil,
-            R.drawable.tool_text,
-            R.drawable.tool_eraser,
-            R.drawable.tool_color
+            R.drawable.ic_tool_selector,
+            R.drawable.ic_tool_pencil,
+            R.drawable.ic_tool_text,
+            R.drawable.ic_tool_eraser,
+            R.drawable.ic_tool_color
     };
     private final int[] ids = new int[]{
             R.id.tool_selector,
@@ -54,7 +54,7 @@ public class ApplianceView extends RadioGroup {
     private RadioButton initRadioButton(int index, int size) {
         RadioButton button = new RadioButton(getContext());
         button.setId(ids[index]);
-        button.setBackgroundResource(R.drawable.slt_bg_radius_4_565656_141414);
+        button.setBackgroundResource(R.drawable.bg_appliance_cell);
         button.setButtonDrawable(null);
 
         Drawable drawable = getResources().getDrawable(appliances[index]);

@@ -31,7 +31,7 @@
         android:layout_height="@dimen/dp_34"
         android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/dp_10"
-        android:background="@drawable/btn_circle_stroke_1_color_dbe2e5"
+        android:background="@drawable/bg_chat_edit"
         android:hint="@string/hint_im_message"
         android:imeOptions="actionSend"
         android:paddingStart="@dimen/dp_13"
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/pic_message" />
+            android:src="@drawable/img_message" />
 
     </FrameLayout>
 

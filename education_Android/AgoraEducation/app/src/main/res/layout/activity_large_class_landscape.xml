@@ -53,26 +53,26 @@
         android:id="@+id/layout_share_video"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/layout_whiteboard"
-        app:layout_constraintEnd_toEndOf="@id/layout_whiteboard"
-        app:layout_constraintStart_toStartOf="@id/layout_whiteboard"
-        app:layout_constraintTop_toTopOf="@id/layout_whiteboard" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/line_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_view" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/layout_hand_up"
-        android:layout_width="@dimen/dp_44"
-        android:layout_height="@dimen/dp_44"
+        android:layout_width="@dimen/dp_46"
+        android:layout_height="@dimen/dp_46"
         android:layout_gravity="top|end"
         android:layout_marginTop="@dimen/dp_10"
         android:layout_marginEnd="@dimen/dp_10"
         android:padding="@dimen/dp_4"
-        app:layout_constraintEnd_toEndOf="@id/layout_whiteboard"
-        app:layout_constraintTop_toTopOf="@id/layout_whiteboard">
+        app:layout_constraintEnd_toStartOf="@id/line_vertical"
+        app:layout_constraintTop_toBottomOf="@id/title_view">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_slt_hand_up" />
+            android:src="@drawable/ic_hand_up" />
 
     </androidx.cardview.widget.CardView>
 

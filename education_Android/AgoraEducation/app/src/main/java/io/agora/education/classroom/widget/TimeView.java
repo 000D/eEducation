@@ -41,7 +41,7 @@ public class TimeView extends AppCompatTextView {
         setTextSize(12);
         Resources resources = getResources();
         setTextColor(resources.getColor(R.color.gray_333333));
-        setCompoundDrawablesRelativeWithIntrinsicBounds(resources.getDrawable(R.drawable.icon_time), null, null, null);
+        setCompoundDrawablesRelativeWithIntrinsicBounds(resources.getDrawable(R.drawable.ic_time), null, null, null);
     }
 
     public long getTime() {

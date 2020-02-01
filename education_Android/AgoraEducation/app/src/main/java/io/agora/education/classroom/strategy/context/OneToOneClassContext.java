@@ -4,7 +4,10 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.agora.education.classroom.strategy.channel.ChannelStrategy;
+import io.agora.education.classroom.bean.user.Student;
+import io.agora.education.classroom.bean.user.Teacher;
+import io.agora.education.classroom.bean.user.User;
+import io.agora.education.classroom.strategy.ChannelStrategy;
 import io.agora.rtc.Constants;
 import io.agora.rtm.ErrorInfo;
 import io.agora.rtm.ResultCallback;
@@ -56,6 +59,29 @@ public class OneToOneClassContext extends ClassContext {
         if (channelStrategy.getLocal().isGenerate) {
             channelStrategy.updateLocalAttribute(channelStrategy.getLocal(), null);
         }
+    }
+
+    @Override
+    public void onTeacherChanged(Teacher teacher) {
+        super.onTeacherChanged(teacher);
+        if (classEventListener instanceof OneToOneClassEventListener) {
+            runListener(() -> ((OneToOneClassEventListener) classEventListener).onTeacherMediaChanged(teacher));
+        }
+    }
+
+    @Override
+    public void onLocalChanged(Student local) {
+        super.onLocalChanged(local);
+        if (local.isGenerate) return;
+        if (classEventListener instanceof OneToOneClassEventListener) {
+            runListener(() -> ((OneToOneClassEventListener) classEventListener).onLocalMediaChanged(local));
+        }
+    }
+
+    public interface OneToOneClassEventListener extends ClassEventListener {
+        void onTeacherMediaChanged(User user);
+
+        void onLocalMediaChanged(User user);
     }
 
 }

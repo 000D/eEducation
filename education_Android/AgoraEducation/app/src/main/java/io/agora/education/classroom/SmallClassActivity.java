@@ -12,22 +12,17 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import io.agora.base.ToastManager;
 import io.agora.education.R;
 import io.agora.education.classroom.adapter.ClassVideoAdapter;
 import io.agora.education.classroom.annotation.ClassType;
-import io.agora.education.classroom.bean.msg.ChannelMsg;
-import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.bean.user.Teacher;
-import io.agora.education.classroom.fragment.StudentListFragment;
-import io.agora.education.classroom.widget.TitleView;
+import io.agora.education.classroom.bean.user.User;
+import io.agora.education.classroom.fragment.UserListFragment;
+import io.agora.education.classroom.strategy.context.SmallClassContext;
 import io.agora.rtc.Constants;
 
-public class SmallClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
+public class SmallClassActivity extends BaseClassActivity implements SmallClassContext.SmallClassEventListener, TabLayout.OnTabSelectedListener {
 
-    @BindView(R.id.title_view)
-    protected TitleView title_view;
     @BindView(R.id.rcv_videos)
     protected RecyclerView rcv_videos;
     @BindView(R.id.layout_im)
@@ -36,7 +31,7 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
     protected TabLayout layout_tab;
 
     private ClassVideoAdapter adapter;
-    private StudentListFragment studentListFragment;
+    private UserListFragment userListFragment;
 
     @Override
     protected int getLayoutResId() {
@@ -46,24 +41,22 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initData() {
         super.initData();
-        adapter = new ClassVideoAdapter(getLocal());
+        adapter = new ClassVideoAdapter(getMyUserId());
     }
 
     @Override
     protected void initView() {
         super.initView();
-        title_view.setTitle(getRoomName());
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rcv_videos.setLayoutManager(layoutManager);
         rcv_videos.setAdapter(adapter);
 
         layout_tab.addOnTabSelectedListener(this);
 
-        studentListFragment = new StudentListFragment();
+        userListFragment = new UserListFragment();
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.layout_chat_room, studentListFragment)
-                .hide(studentListFragment)
+                .add(R.id.layout_chat_room, userListFragment)
+                .hide(userListFragment)
                 .commit();
     }
 
@@ -85,62 +78,18 @@ public class SmallClassActivity extends BaseClassActivity implements TabLayout.O
     }
 
     @Override
-    public void onChannelInfoInit() {
-        if (classContext.channelStrategy.getTeacher() == null) {
-            ToastManager.showShort(R.string.There_is_no_teacher_in_this_classroom);
-        }
-    }
-
-    @Override
-    public void onLocalChanged(Student local) {
-        adapter.setLocal(local);
-        chatRoomFragment.setEditTextEnable(local.chat == 1);
-        studentListFragment.setStudentList(classContext.channelStrategy.getAllStudents());
-    }
-
-    @Override
-    public void onTeacherChanged(Teacher teacher) {
-        title_view.setTimeState(teacher.class_state == 1);
-
-        adapter.setTeacher(teacher);
-
-        joinWhiteboard(teacher.whiteboard_uid);
-        chatRoomFragment.setEditTextEnable(teacher.mute_chat == 0);
-    }
-
-    @Override
-    public void onStudentsChanged(List<Student> students) {
-        adapter.setStudents(students);
-        studentListFragment.setStudentList(classContext.channelStrategy.getAllStudents());
-    }
-
-    @Override
-    public void onChannelMsgReceived(ChannelMsg msg) {
-        chatRoomFragment.addMessage(msg);
-    }
-
-    @Override
-    public void onPeerMsgReceived(PeerMsg msg) {
-
-    }
-
-    @Override
-    public void onScreenShareJoined(int uid) {
-        showScreenShare(uid);
-    }
-
-    @Override
-    public void onScreenShareOffline(int uid) {
-        dismissScreenShare(uid);
+    public void onUsersMediaChanged(List<User> users) {
+        adapter.setUsers(users);
+        userListFragment.setUserList(users);
     }
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         if (tab.getPosition() == 0) {
-            transaction.show(chatRoomFragment).hide(studentListFragment);
+            transaction.show(chatRoomFragment).hide(userListFragment);
         } else {
-            transaction.show(studentListFragment).hide(chatRoomFragment);
+            transaction.show(userListFragment).hide(chatRoomFragment);
         }
         transaction.commit();
     }

@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_2"
-        android:background="@drawable/btn_radius_4_e7f6ff_stroke"
+        android:background="@drawable/bg_msg_me"
         android:paddingStart="@dimen/dp_9"
         android:paddingTop="@dimen/dp_5"
         android:paddingEnd="@dimen/dp_9"

@@ -10,8 +10,8 @@ public class Student extends User implements Cloneable {
     public int chat; // enable chat -- 0: disable, 1: enable
     public transient boolean isGenerate; // create by local
 
-    public Student() {
-        isGenerate = true;
+    public Student(boolean isGenerate) {
+        this.isGenerate = isGenerate;
     }
 
     public Student(int uid, String account, @ClientRole int role) {

@@ -16,13 +16,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.agora.education.R;
 import io.agora.education.classroom.BaseClassActivity;
-import io.agora.rtc.IRtcEngineEventHandler;
+import io.agora.rtc.Constants;
+import io.agora.sdk.annotation.NetworkQuality;
 
 public class TitleView extends ConstraintLayout {
 
     @Nullable
-    @BindView(R.id.ic_wifi)
-    protected ImageView ic_wifi;
+    @BindView(R.id.iv_quality)
+    protected ImageView iv_quality;
     @BindView(R.id.tv_room_name)
     protected TextView tv_room_name;
     @Nullable
@@ -58,12 +59,20 @@ public class TitleView extends ConstraintLayout {
         tv_room_name.setText(title);
     }
 
-    public void setWifiState(IRtcEngineEventHandler.RtcStats stats) {
-        if (ic_wifi != null) {
-            if (stats.rxPacketLossRate > 30 || stats.txPacketLossRate > 30) {
-                ic_wifi.setColorFilter(getResources().getColor(R.color.red_FF0D19));
-            } else {
-                ic_wifi.clearColorFilter();
+    public void setNetworkQuality(@NetworkQuality int quality) {
+        if (iv_quality != null) {
+            switch (quality) {
+                case Constants.QUALITY_EXCELLENT:
+                case Constants.QUALITY_GOOD:
+                    iv_quality.setImageResource(R.drawable.ic_signal_good);
+                    break;
+                case Constants.QUALITY_VBAD:
+                case Constants.QUALITY_DOWN:
+                    iv_quality.setImageResource(R.drawable.ic_signal_bad);
+                    break;
+                default:
+                    iv_quality.setImageResource(R.drawable.ic_signal_normal);
+                    break;
             }
         }
     }

@@ -1,8 +1,8 @@
 package io.agora.education.classroom.mediator;
 
-import io.agora.sdk.manager.RtcManager;
 import io.agora.education.classroom.widget.RtcVideoView;
 import io.agora.rtc.video.VideoCanvas;
+import io.agora.sdk.manager.RtcManager;
 
 public class VideoMediator {
 

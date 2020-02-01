@@ -1,13 +1,17 @@
 package io.agora.education;
 
 import android.Manifest;
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
 import butterknife.BindView;
@@ -21,6 +25,8 @@ import io.agora.education.classroom.SmallClassActivity;
 import io.agora.education.classroom.annotation.ClassType;
 import io.agora.education.classroom.strategy.context.ClassContext;
 import io.agora.education.classroom.strategy.context.ClassContextFactory;
+import io.agora.education.support.DownloadReceiver;
+import io.agora.education.support.EduAPI;
 import io.agora.education.util.AppUtil;
 import io.agora.education.util.CryptoUtil;
 import io.agora.rtm.ErrorInfo;
@@ -29,7 +35,10 @@ import io.agora.sdk.manager.RtmManager;
 
 public class MainActivity extends BaseActivity {
 
-    private final int PERMISSION_CODE = 100;
+    private final int REQUEST_CODE_DOWNLOAD = 100;
+    private final int REQUEST_CODE_RTC = 101;
+
+    private String url = "http://oss.pgyer.com/2738095fa881aa1627caf3754eaa1219.apk?auth_key=1580550094-f501375f7ae5e5f8abbf2e0f29403371-0-89deaaa402bc18dc3b7068e2868f1e70&response-content-disposition=attachment%3B+filename%3Dapp-debug.apk";
 
     @BindView(R.id.et_room_name)
     protected EditText et_room_name;
@@ -40,6 +49,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.card_room_type)
     protected CardView card_room_type;
 
+    private DownloadReceiver receiver = new DownloadReceiver();
     private int myUserId;
 
     @Override
@@ -49,6 +59,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        // TODO TEST
         et_room_name.setText("1234");
         et_your_name.setText("000");
     }
@@ -57,6 +68,33 @@ public class MainActivity extends BaseActivity {
     protected void initData() {
         myUserId = (int) (System.currentTimeMillis() * 1000 % 1000000);
         RtmManager.instance().login(getString(R.string.agora_rtm_token), myUserId);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        filter.setPriority(IntentFilter.SYSTEM_LOW_PRIORITY);
+        registerReceiver(receiver, filter);
+
+        if (AppUtil.checkAndRequestAppPermission(this, new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        }, REQUEST_CODE_DOWNLOAD)) {
+            receiver.downloadApk(this, url);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EduAPI.checkVersion();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(receiver);
     }
 
     private void joinRoom() {
@@ -124,15 +162,20 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode != PERMISSION_CODE)
-            return;
         for (int result : grantResults) {
             if (result != PackageManager.PERMISSION_GRANTED) {
                 ToastManager.showShort(R.string.No_enough_permissions);
                 return;
             }
         }
-        joinRoom();
+        switch (requestCode) {
+            case REQUEST_CODE_DOWNLOAD:
+                receiver.downloadApk(this, url);
+                break;
+            case REQUEST_CODE_RTC:
+                joinRoom();
+                break;
+        }
     }
 
     @OnClick({R.id.iv_setting, R.id.et_room_type, R.id.btn_join, R.id.tv_one2one, R.id.tv_small_class, R.id.tv_large_class})
@@ -149,12 +192,11 @@ public class MainActivity extends BaseActivity {
                 }
                 break;
             case R.id.btn_join:
-                String[] requestPermission = {
+                if (AppUtil.checkAndRequestAppPermission(this, new String[]{
                         Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.CAMERA,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
-                };
-                if (AppUtil.checkAndRequestAppPermission(this, requestPermission, PERMISSION_CODE)) {
+                }, REQUEST_CODE_RTC)) {
                     joinRoom();
                 }
                 break;

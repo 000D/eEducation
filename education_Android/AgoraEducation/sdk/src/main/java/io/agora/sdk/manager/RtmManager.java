@@ -79,8 +79,8 @@ public final class RtmManager extends SdkManager<RtmClient> implements RtmClient
         });
     }
 
-    public void login(String token, int userId) {
-        sdk.login(token, String.valueOf(userId), null);
+    public void login(String rtmToken, int userId) {
+        sdk.login(rtmToken, String.valueOf(userId), null);
     }
 
     @Override

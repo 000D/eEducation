@@ -5,57 +5,49 @@ import android.content.Context;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 
 import io.agora.education.R;
+import io.agora.education.classroom.bean.channel.ChannelInfo;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
 import io.agora.education.classroom.bean.msg.Cmd;
 import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.bean.user.Student;
 import io.agora.education.classroom.bean.user.Teacher;
-import io.agora.education.classroom.strategy.channel.ChannelEventListener;
-import io.agora.education.classroom.strategy.channel.ChannelStrategy;
+import io.agora.education.classroom.strategy.ChannelEventListener;
+import io.agora.education.classroom.strategy.ChannelStrategy;
 import io.agora.rtm.ErrorInfo;
 import io.agora.rtm.ResultCallback;
+import io.agora.sdk.listener.RtcEventListener;
 import io.agora.sdk.manager.RtcManager;
-import io.agora.sdk.manager.RtmManager;
-import io.agora.sdk.manager.SdkManager;
 
 public abstract class ClassContext implements ChannelEventListener {
 
     private Context context;
-    private ChannelEventListener channelEventListener;
 
-    public ChannelStrategy channelStrategy;
+    ChannelStrategy channelStrategy;
+    ClassEventListener classEventListener;
 
     ClassContext(Context context, ChannelStrategy strategy) {
         this.context = context;
         channelStrategy = strategy;
         channelStrategy.setChannelEventListener(this);
+        RtcManager.instance().registerListener(rtcEventListener);
     }
 
-    public void setChannelEventListener(ChannelEventListener listener) {
-        channelEventListener = listener;
+    public void setClassEventListener(ClassEventListener listener) {
+        classEventListener = listener;
     }
 
     public abstract void checkChannelEnterable(@NotNull ResultCallback<Boolean> callback);
 
     public void joinChannel() {
-        RtmManager.instance().joinChannel(new HashMap<String, String>() {{
-            put(SdkManager.CHANNEL_ID, channelStrategy.getChannelId());
-        }});
         preConfig();
-        RtcManager.instance().joinChannel(new HashMap<String, String>() {{
-            put(SdkManager.TOKEN, context.getString(R.string.agora_rtc_token));
-            put(SdkManager.CHANNEL_ID, channelStrategy.getChannelId());
-            put(SdkManager.USER_ID, channelStrategy.getLocal().getUserId());
-        }});
+        channelStrategy.joinChannel(context.getString(R.string.agora_rtc_token));
     }
 
     public void leaveChannel() {
-        RtmManager.instance().leaveChannel();
-        RtcManager.instance().leaveChannel();
+        channelStrategy.leaveChannel();
     }
 
     abstract void preConfig();
@@ -110,11 +102,12 @@ public abstract class ClassContext implements ChannelEventListener {
     public void release() {
         channelStrategy.clearLocalAttribute(null);
         channelStrategy.release();
+        RtcManager.instance().unregisterListener(rtcEventListener);
         leaveChannel();
     }
 
-    private void runListener(Runnable runnable) {
-        if (channelEventListener != null) {
+    void runListener(Runnable runnable) {
+        if (classEventListener != null) {
             if (context instanceof Activity) {
                 ((Activity) context).runOnUiThread(runnable);
             }
@@ -123,27 +116,30 @@ public abstract class ClassContext implements ChannelEventListener {
 
     @Override
     public void onChannelInfoInit() {
-        runListener(() -> channelEventListener.onChannelInfoInit());
+        runListener(() -> classEventListener.onTeacherInit(channelStrategy.getTeacher()));
     }
 
     @Override
     public void onLocalChanged(Student local) {
-        runListener(() -> channelEventListener.onLocalChanged(local));
+        runListener(() -> classEventListener.onMuteLocalChat(local.chat == 0));
     }
 
     @Override
     public void onTeacherChanged(Teacher teacher) {
-        runListener(() -> channelEventListener.onTeacherChanged(teacher));
+        runListener(() -> {
+            classEventListener.onClassStateChanged(teacher.class_state == 1);
+            classEventListener.onWhiteboardIdChanged(teacher.whiteboard_uid);
+            classEventListener.onMuteAllChat(teacher.mute_chat == 1);
+        });
     }
 
     @Override
     public void onStudentsChanged(List<Student> students) {
-        runListener(() -> channelEventListener.onStudentsChanged(students));
     }
 
     @Override
     public void onChannelMsgReceived(ChannelMsg msg) {
-        runListener(() -> channelEventListener.onChannelMsgReceived(msg));
+        runListener(() -> classEventListener.onChannelMsgReceived(msg));
     }
 
     @Override
@@ -170,17 +166,29 @@ public abstract class ClassContext implements ChannelEventListener {
                 muteLocalChat(false);
                 break;
         }
-        runListener(() -> channelEventListener.onPeerMsgReceived(msg));
     }
 
-    @Override
-    public void onScreenShareJoined(int uid) {
-        runListener(() -> channelEventListener.onScreenShareJoined(uid));
-    }
+    private RtcEventListener rtcEventListener = new RtcEventListener() {
+        @Override
+        public void onNetworkQuality(int uid, int txQuality, int rxQuality) {
+            if (uid == 0) {
+                runListener(() -> classEventListener.onNetworkQualityChanged(Math.max(txQuality, rxQuality)));
+            }
+        }
 
-    @Override
-    public void onScreenShareOffline(int uid) {
-        runListener(() -> channelEventListener.onScreenShareOffline(uid));
-    }
+        @Override
+        public void onUserJoined(int uid, int elapsed) {
+            if (uid == ChannelInfo.SHARE_UID) {
+                runListener(() -> classEventListener.onScreenShareJoined(uid));
+            }
+        }
+
+        @Override
+        public void onUserOffline(int uid, int reason) {
+            if (uid == ChannelInfo.SHARE_UID) {
+                runListener(() -> classEventListener.onScreenShareOffline(uid));
+            }
+        }
+    };
 
 }

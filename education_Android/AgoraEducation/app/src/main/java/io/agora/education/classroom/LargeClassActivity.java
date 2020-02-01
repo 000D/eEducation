@@ -12,28 +12,21 @@ import androidx.cardview.widget.CardView;
 
 import com.google.android.material.tabs.TabLayout;
 
-import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.agora.base.ToastManager;
 import io.agora.education.R;
 import io.agora.education.classroom.annotation.ClassType;
-import io.agora.education.classroom.bean.msg.ChannelMsg;
-import io.agora.education.classroom.bean.msg.Cmd;
-import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.bean.user.Student;
-import io.agora.education.classroom.bean.user.Teacher;
+import io.agora.education.classroom.bean.user.User;
 import io.agora.education.classroom.strategy.context.LargeClassContext;
 import io.agora.education.classroom.widget.RtcVideoView;
-import io.agora.education.classroom.widget.TitleView;
 import io.agora.rtc.Constants;
 
-public class LargeClassActivity extends BaseClassActivity implements TabLayout.OnTabSelectedListener {
+public class LargeClassActivity extends BaseClassActivity implements LargeClassContext.LargeClassEventListener, TabLayout.OnTabSelectedListener {
 
-    @BindView(R.id.title_view)
-    protected TitleView title_view;
     @BindView(R.id.layout_video_teacher)
     protected FrameLayout layout_video_teacher;
     @BindView(R.id.layout_video_student)
@@ -51,6 +44,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
 
     private RtcVideoView video_teacher;
     private RtcVideoView video_student;
+    private int linkUid;
 
     @Override
     protected int getLayoutResId() {
@@ -67,18 +61,26 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     @Override
     protected void initView() {
         super.initView();
-        title_view.setTitle(getRoomName());
-
         if (video_teacher == null) {
             video_teacher = new RtcVideoView(this);
-            video_teacher.init(R.layout.item_user_video_large_class_teacher, false);
+            video_teacher.init(R.layout.layout_video_large_class, false);
         }
         removeFromParent(video_teacher);
         layout_video_teacher.addView(video_teacher, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         if (video_student == null) {
             video_student = new RtcVideoView(this);
-            video_student.init(R.layout.item_user_video_mini_class, true);
+            video_student.init(R.layout.layout_video_small_class, true);
+            video_student.setOnClickAudioListener(v -> {
+                if (linkUid == getMyUserId()) {
+                    classContext.muteLocalAudio(!video_student.isAudioMuted());
+                }
+            });
+            video_student.setOnClickVideoListener(v -> {
+                if (linkUid == getMyUserId()) {
+                    classContext.muteLocalVideo(!video_student.isVideoMuted());
+                }
+            });
         }
         removeFromParent(video_student);
         layout_video_student.addView(video_student, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -91,7 +93,7 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
             layout_share_video.addView(surface_share_video, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         }
 
-        resetHandState();
+        resetHandState(linkUid);
     }
 
     @Override
@@ -116,105 +118,65 @@ public class LargeClassActivity extends BaseClassActivity implements TabLayout.O
     public void onClick(View view) {
         boolean isSelected = view.isSelected();
         if (isSelected) {
-            ((LargeClassContext) classContext).cancel();
+            ((LargeClassContext) classContext).cancel(false);
         } else {
+            // update local attributes
             ((LargeClassContext) classContext).apply(true);
         }
     }
 
     @Override
-    public void onChannelInfoInit() {
-        if (classContext.channelStrategy.getTeacher() == null) {
-            ToastManager.showShort(R.string.There_is_no_teacher_in_this_classroom);
-        }
+    public void onUserCountChanged(int count) {
+        title_view.setTitle(String.format(Locale.getDefault(), "%s(%d)", getRoomName(), count));
     }
 
     @Override
-    public void onLocalChanged(Student local) {
-        if (!local.isGenerate)
-            ((LargeClassContext) classContext).apply(false);
-        showStudentVideo();
+    public void onTeacherMediaChanged(User user) {
+        video_teacher.setName(user.account);
+        video_teacher.showRemote(user.uid);
+        video_teacher.muteVideo(user.video == 0);
+        video_teacher.muteAudio(user.audio == 0);
     }
 
     @Override
-    public void onTeacherChanged(Teacher teacher) {
-        title_view.setTimeState(teacher.class_state == 1);
-
-        video_teacher.setName(teacher.account);
-        video_teacher.showRemote(teacher.uid);
-        video_teacher.muteVideo(teacher.video == 0);
-        video_teacher.muteAudio(teacher.audio == 0);
-
-        showStudentVideo();
-
-        resetHandState();
-
-        joinWhiteboard(teacher.whiteboard_uid);
-        chatRoomFragment.setEditTextEnable(teacher.mute_chat == 0);
-    }
-
-    @Override
-    public void onStudentsChanged(List<Student> students) {
-        showStudentVideo();
-    }
-
-    private void showStudentVideo() {
-        int linkUid = classContext.channelStrategy.getTeacher().link_uid;
-        if (linkUid == 0) {
+    public void onLinkMediaChanged(User user) {
+        if (user == null) {
             video_student.setVisibility(View.GONE);
             video_student.setSurfaceView(null);
         } else {
-            List<Student> students = classContext.channelStrategy.getAllStudents();
-            for (Student student : students) {
-                if (linkUid == student.uid) {
-                    video_student.setName(student.account);
-                    if (getMyUserId() == student.uid) {
-                        video_student.showLocal();
-                    } else {
-                        video_student.showRemote(student.uid);
-                    }
-                    video_student.muteVideo(student.video == 0);
-                    video_student.muteAudio(student.audio == 0);
-                    video_student.setVisibility(View.VISIBLE);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void resetHandState() {
-        Teacher teacher = classContext.channelStrategy.getTeacher();
-        if (teacher != null) {
-            if (teacher.link_uid == getMyUserId()) {
-                layout_hand_up.setEnabled(true);
-                layout_hand_up.setSelected(true);
+            video_student.setName(user.account);
+            if (getMyUserId() == user.uid) {
+                video_student.showLocal();
             } else {
-                layout_hand_up.setEnabled(teacher.link_uid == 0);
-                layout_hand_up.setSelected(false);
+                video_student.showRemote(user.uid);
             }
+            // make sure the student video always on the top
+            video_student.getSurfaceView().setZOrderMediaOverlay(true);
+            video_student.muteVideo(user.video == 0);
+            video_student.muteAudio(user.audio == 0);
+            video_student.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    public void onChannelMsgReceived(ChannelMsg msg) {
-        chatRoomFragment.addMessage(msg);
+    public void onLinkUidChanged(int uid) {
+        linkUid = uid;
+        resetHandState(linkUid);
     }
 
     @Override
-    public void onPeerMsgReceived(PeerMsg msg) {
-        if (msg.getCmd() == Cmd.CANCEL) {
+    public void onHandUpCanceled() {
+        layout_hand_up.setSelected(false);
+    }
+
+    private void resetHandState(int linkUid) {
+        if (linkUid == getMyUserId()) {
+            layout_hand_up.setEnabled(true);
+            layout_hand_up.setSelected(true);
+        } else {
+            layout_hand_up.setEnabled(linkUid == 0);
             layout_hand_up.setSelected(false);
         }
-    }
-
-    @Override
-    public void onScreenShareJoined(int uid) {
-        showScreenShare(uid);
-    }
-
-    @Override
-    public void onScreenShareOffline(int uid) {
-        dismissScreenShare(uid);
     }
 
     @Override

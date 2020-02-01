@@ -25,6 +25,8 @@ public class ChatRoomFragment extends BaseFragment implements AdapterView.OnItem
     protected EditText edit_send_msg;
 
     private MessageListAdapter adapter;
+    private boolean isMuteAll;
+    private boolean isMuteLocal;
 
     @Override
     protected int getLayoutResId() {
@@ -43,7 +45,17 @@ public class ChatRoomFragment extends BaseFragment implements AdapterView.OnItem
         edit_send_msg.setOnKeyListener(this);
     }
 
-    public void setEditTextEnable(boolean isEnable) {
+    public void setMuteAll(boolean isMuteAll) {
+        this.isMuteAll = isMuteAll;
+        setEditTextEnable(!(this.isMuteAll || isMuteLocal));
+    }
+
+    public void setMuteLocal(boolean isMuteLocal) {
+        this.isMuteLocal = isMuteLocal;
+        setEditTextEnable(!(this.isMuteAll || isMuteLocal));
+    }
+
+    private void setEditTextEnable(boolean isEnable) {
         runOnUiThread(() -> {
             if (edit_send_msg != null) {
                 edit_send_msg.setEnabled(isEnable);
@@ -68,6 +80,7 @@ public class ChatRoomFragment extends BaseFragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ChannelMsg msg = adapter.getItem(position);
+        // TODO TEST
         msg.link = "/replay/c97c09499a6e4a7086b1d3c3802c634d/1579145682784/1579145699157";
         msg.url = "https://beings.oss-cn-hangzhou.aliyuncs.com/8a44107d5546925853e1c792a1309343_281dc9bdb52d04dc20036dbd8313ed055.m3u8";
         if (!TextUtils.isEmpty(msg.link)) {

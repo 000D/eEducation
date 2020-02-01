@@ -1,10 +1,10 @@
 package io.agora.education.classroom.mediator;
 
-import io.agora.sdk.manager.RtmManager;
 import io.agora.education.classroom.bean.msg.ChannelMsg;
 import io.agora.education.classroom.bean.msg.Cmd;
 import io.agora.education.classroom.bean.msg.PeerMsg;
 import io.agora.education.classroom.bean.user.User;
+import io.agora.sdk.manager.RtmManager;
 
 public class MsgMediator {
 
