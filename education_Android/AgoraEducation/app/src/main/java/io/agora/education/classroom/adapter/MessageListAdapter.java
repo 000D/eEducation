@@ -25,7 +25,7 @@ public class MessageListAdapter extends BaseListAdapter<ChannelMsg, MessageListA
             viewHolder.tv_content.setTextColor(resources.getColor(R.color.gray_666666));
             viewHolder.tv_content.getPaint().setFlags(0);
         } else {
-            viewHolder.tv_content.setText(resources.getString(R.string.replay_recording));
+            viewHolder.tv_content.setText(R.string.replay_recording);
             viewHolder.tv_content.setTextColor(resources.getColor(R.color.blue_1F3DE8));
             viewHolder.tv_content.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         }

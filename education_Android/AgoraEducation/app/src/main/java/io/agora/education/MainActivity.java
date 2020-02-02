@@ -196,15 +196,15 @@ public class MainActivity extends BaseActivity {
                 }
                 break;
             case R.id.tv_one2one:
-                et_room_type.setText(getString(R.string.one2one_class));
+                et_room_type.setText(R.string.one2one_class);
                 card_room_type.setVisibility(View.GONE);
                 break;
             case R.id.tv_small_class:
-                et_room_type.setText(getString(R.string.small_class));
+                et_room_type.setText(R.string.small_class);
                 card_room_type.setVisibility(View.GONE);
                 break;
             case R.id.tv_large_class:
-                et_room_type.setText(getString(R.string.large_class));
+                et_room_type.setText(R.string.large_class);
                 card_room_type.setVisibility(View.GONE);
                 break;
         }
