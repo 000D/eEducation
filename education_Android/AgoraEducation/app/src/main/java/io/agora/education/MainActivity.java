@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -16,6 +17,7 @@ import androidx.cardview.widget.CardView;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 import io.agora.base.ToastManager;
 import io.agora.education.base.BaseActivity;
 import io.agora.education.classroom.BaseClassActivity;
@@ -184,13 +186,6 @@ public class MainActivity extends BaseActivity {
             case R.id.iv_setting:
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
-            case R.id.et_room_type:
-                if (card_room_type.getVisibility() == View.GONE) {
-                    card_room_type.setVisibility(View.VISIBLE);
-                } else {
-                    card_room_type.setVisibility(View.GONE);
-                }
-                break;
             case R.id.btn_join:
                 if (AppUtil.checkAndRequestAppPermission(this, new String[]{
                         Manifest.permission.RECORD_AUDIO,
@@ -212,6 +207,17 @@ public class MainActivity extends BaseActivity {
                 et_room_type.setText(getString(R.string.large_class));
                 card_room_type.setVisibility(View.GONE);
                 break;
+        }
+    }
+
+    @OnTouch(R.id.et_room_type)
+    public void onTouch(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (card_room_type.getVisibility() == View.GONE) {
+                card_room_type.setVisibility(View.VISIBLE);
+            } else {
+                card_room_type.setVisibility(View.GONE);
+            }
         }
     }
 
